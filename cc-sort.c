@@ -227,4 +227,5 @@ int main(void)
    printf ("reverse\n");
    print (arr, SIZE);
    reverse (arr, SIZE);
-   print (arr, SIZE);}
+   print (arr, SIZE);
+}

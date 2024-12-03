@@ -355,5 +355,5 @@ int main(void)
       qsort (i_numbers, i_size, sizeof(*i_numbers), cmpint);
    }
    t_finish = clock();
-   printf ("quicksort     : %6.3f s\n", (double)(t_finish  - t_start - t_baseline) / CLOCKS_PER_SEC);
+   printf ("quicksort (*) : %6.3f s\n", (double)(t_finish  - t_start - t_baseline) / CLOCKS_PER_SEC);
 }
