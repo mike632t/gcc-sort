@@ -19,6 +19,8 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * 30 Nov 24   0.1   - Initial version - MT
+ *  5 Dec 24   0.2   - Added comb sort and alternate bubble sort - MT
+ *                   - Defined 'True' and 'False' - MT
  *
  */
 
@@ -31,62 +33,64 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define  ITERATIONS  1000
 #define  SIZE        11
 
-void swap (int arr[], int m, int n)
+#define True 1
+#define False !(True)
+
+void swap (int a[], int m, int n)
 {
    int tmp;
-   tmp = arr[m];
-   arr[m] = arr[n];
-   arr[n] = tmp;
+   tmp = a[m];
+   a[m] = a[n];
+   a[n] = tmp;
 }
 
-void shuffle (int arr[], int n) 
+void shuffle (int a[], int n) 
 {
    int i, j;
 
    for (i = n - 1; i > 0 ; i--)
    {
       j = (int)((double)i * (rand() / (RAND_MAX + 1.0)));
-      swap (arr, i, j);
+      swap (a, i, j);
    }
 }
 
-void reverse (int arr[], int n) 
+void reverse (int a[], int n) 
 
 /* Based on K+R Ed 2 Page 62 */
 {
    int i = 0;
       while (i < --n)
       {
-         swap (arr, i, n);
+         swap (a, i, n);
          i++;
       }
 }
 
-void init (int *arr, int n)
+void init (int *a, int n)
 {
    int i;
    for (i = 0; i < n; i++)
-      arr[i] = i - n / 2;
+      a[i] = i - n / 2;
    srand (1966);
-   shuffle (arr , n);
+   shuffle (a , n);
 }
 
-void print (int *arr, int n)
+void print (int *a, int n)
 {
    int i;
    if (n > 0)
    {
-      printf ("(%3d", arr[0]);
+      printf ("(%3d", a[0]);
       for (i = 1; i < n; i++)
-         printf (", %3d", arr[i]);
+         printf (", %3d", a[i]);
    }
    printf (")\n");
 }
 
-void bubblesort (int arr[], int n) 
+void bubblesort (int a[], int n) 
 
 /* Iterates over the elements in the array comparing each pair of  adjacent
  * elements, swapping pairs of elements that are out of order. */
@@ -94,11 +98,31 @@ void bubblesort (int arr[], int n)
    int i, j;  
    for (i = 0; i < n - 1; i++)
       for (j = 0; j < n - i - 1; j++)
-         if (arr[j] > arr[j + 1])
-            swap (arr, j, j + 1);
-}  
+         if (a[j] > a[j + 1])
+            swap (a, j, j + 1);
+}
 
-void exchangesort (int arr[], int n)
+void _bubblesort (int *a, int n)
+{
+   int i, t, j = n, s = True;
+
+   while (s) {
+      s = False;
+      for (i = 1; i < j; i++)
+      {
+         if (a[i] < a[i - 1])
+         {
+            t = a[i];
+            a[i] = a[i - 1];
+            a[i - 1] = t;
+            s = True;
+         }
+      }
+      j--;
+   }
+}
+
+void exchangesort (int a[], int n)
 
 /* Begins  with  the first element in the array and compares it with  every
  * following  element in the array.  If any of the following  elements  are
@@ -108,13 +132,13 @@ void exchangesort (int arr[], int n)
    int i, j;
    for (i = 0; i < n - 1; i++)
       for (j = i + 1; j < n; j++)
-          if (arr[i] > arr[j]) 
+          if (a[i] > a[j]) 
             /* If  the  previous element is bigger than the next swap  them 
              * over. */
-            swap (arr, i, j);
+            swap (a, i, j);
 }
 
-void insertionsort (int arr[], int n) 
+void insertionsort (int a[], int n) 
 
 /* Compares  each successive element in the array with all of the preceding 
  * elements.  When an appropriate position if found the element is inserted
@@ -125,17 +149,17 @@ void insertionsort (int arr[], int n)
    for (i = 1; i < n; i++)
    {
       j = i;
-      k = arr[i];
-      while (j > 0 && k < arr[j - 1])
+      k = a[i];
+      while (j > 0 && k < a[j - 1])
       {
-         arr[j] = arr[j - 1];
+         a[j] = a[j - 1];
          j--;
       }
-      arr[j] = k;
+      a[j] = k;
    }
 }
 
-void insertionsortswap (int arr[], int n) 
+void _insertionsort (int a[], int n) 
 
 /* Insertion sort using swap */
 {
@@ -143,15 +167,41 @@ void insertionsortswap (int arr[], int n)
    for (i = 1; i < n; i++)
    {
       j = i;
-      while (j > 0 && arr[j] <= arr[j - 1])
+      while (j > 0 && a[j] <= a[j - 1])
       {
-         swap (arr, j, j - 1);
+         swap (a, j, j - 1);
          j--;
       }
    }
 }
 
-void shellsort (int arr[], int n) 
+void combsort (int *a, int n)
+
+/* The comb sort improves on the bubble sort by comparing values  separated 
+ * by a variable gap. After each iteration the gap is reduced by a until it 
+ * reaches the value of 1. */
+{            
+   int i, j, k, s = True;
+
+   k = n;
+   while (k > 1 || s == True)
+   {
+      k = k * 10 / 13;
+      if (k == 9 || k == 10) k = 11;
+      if (k < 1) k = 1;
+      s = False;
+      for (i = 0, j = k; j < n; i++, j++)
+      {
+         if (a[i] > a[j])
+         {
+            swap (a, i, j);
+            s = True;
+         }
+      }
+   }
+}
+
+void shellsort (int a[], int n) 
 
 /* Based on K+R Ed 2 Page 62
  * 
@@ -162,70 +212,76 @@ void shellsort (int arr[], int n)
    int i, j, k;
    for (k = n / 2; k > 0; k /= 2)
       for (i = k; i < n; i++)
-         for (j = i - k; j >=0 && arr[j] > arr[j + k]; j -= k)
-            swap (arr, j, j + k);
+         for (j = i - k; j >=0 && a[j] > a[j + k]; j -= k)
+            swap (a, j, j + k);
 }   
 
-void _quicksort (int arr[], int m, int n)
+void _quicksort (int a[], int m, int n)
 
 /* Based on K+R Ed 2 Page 120 */
 {
    int i, l;
 
    if (m >= n) return;
-   swap (arr, m, (m + n)/2);
+   swap (a, m, (m + n) / 2);
    l = m;
    for (i = m + 1; i <= n; i++)
-      if (arr[i] < arr[m])
-         swap(arr, ++l, i);
-   swap (arr, m, l);
-   _quicksort (arr, m, l - 1);
-   _quicksort (arr, l + 1, n);
+      if (a[i] < a[m])
+         swap(a, ++l, i);
+   swap (a, m, l);
+   _quicksort (a, m, l - 1);
+   _quicksort (a, l + 1, n);
 }
 
-void quicksort (int arr[], int n) 
+void quicksort (int a[], int n) 
 
 /* Wrapper for _quicksort() to match the other sort functions */
 {
-   _quicksort (arr, 0, n - 1);
+   _quicksort (a, 0, n - 1);
 }
 
 int main(void)
 {
-   int arr[SIZE];
+   int a[SIZE];
 
    printf ("bubble sort\n");
-   init (arr, SIZE);
-   print (arr, SIZE);
-   bubblesort (arr, SIZE);
-   print (arr, SIZE);
+   init (a, SIZE);
+   print (a, SIZE);
+   bubblesort (a, SIZE);
+   print (a, SIZE);
+
+   printf ("comb sort\n");
+   init (a, SIZE);
+   print (a, SIZE);
+   combsort (a, SIZE);
+   print (a, SIZE);
 
    printf ("exchange sort\n");
-   init (arr, SIZE);
-   print (arr, SIZE);
-   exchangesort (arr, SIZE);
-   print (arr, SIZE);
+   init (a, SIZE);
+   print (a, SIZE);
+   exchangesort (a, SIZE);
+   print (a, SIZE);
 
    printf ("insertion sort\n");
-   init (arr, SIZE);
-   print (arr, SIZE);
-   insertionsort (arr, SIZE);
-   print (arr, SIZE);
+   init (a, SIZE);
+   print (a, SIZE);
+   insertionsort (a, SIZE);
+   print (a, SIZE);
 
    printf ("shell sort\n");
-   init (arr, SIZE);
-   print (arr, SIZE);
-   shellsort (arr, SIZE);
-   print (arr, SIZE);
+   init (a, SIZE);
+   print (a, SIZE);
+   shellsort (a, SIZE);
+   print (a, SIZE);
 
    printf ("quick sort\n");
-   init (arr, SIZE);
-   print (arr, SIZE);
-   quicksort (arr, SIZE);
-   print (arr, SIZE);
+   init (a, SIZE);
+   print (a, SIZE);
+   quicksort (a, SIZE);
+   print (a, SIZE);
 
    printf ("reverse\n");
-   print (arr, SIZE);
-   reverse (arr, SIZE);
-   print (arr, SIZE);
+   print (a, SIZE);
+   reverse (a, SIZE);
+   print (a, SIZE);
 }
