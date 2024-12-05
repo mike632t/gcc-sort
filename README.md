@@ -22,63 +22,104 @@ the current sort routine in the standard library.
   Note - Only 10 iterations
 
 ```
-$ cc cc-sort
-$ link cc-sort
-$ run cc-sort
-bubblesort : 23.840 s
-shellsort  :  0.690 s
-quicksort  :  0.630 s
+$ cc gcc-sort
+$ link gcc-sort
+$ run gcc-sort
+bubblesort    : 26.100 s
+exchangesort  : 18.470 s
+insertionsort : 12.690 s
+shellsort     :  0.650 s
+quicksort     :  0.620 s
+quicksort (*) :  0.380 s
 $ 
 ```
 
+- AlphaServer DS10/466 running Digital UNIX V4.0F with DEC C V5.9-005
+
+```
+$ cc gcc-sort.c -o gcc-sort  
+$ ./cc-sort  
+bubblesort    : 39.515 s
+exchangesort  : 26.016 s
+insertionsort : 23.516 s
+shellsort     :  1.400 s
+quicksort     :  1.483 s
+quicksort (*) :  1.100 s
+$ 
+```
 - AlphaServer DS10/466 running Tru64 UNIX V5.1B with Compaq C V6.5-011 
 
 ```
-$ cc cc-sort.c -o cc-sort  
+$ cc gcc-sort.c -o gcc-sort  
 $ ./cc-sort  
-bubblesort : 41.682 s
-shellsort  :  1.500 s
-quicksort  :  1.250 s
+bubblesort    : 41.648 s
+exchangesort  : 24.699 s
+insertionsort : 22.582 s
+shellsort     :  1.450 s
+quicksort     :  1.250 s
+quicksort (*) :  0.817 s
 $ 
 ```
 
 - AlphaServer DS10/466 running OpenVMS V7.3-2 with Compaq C V6.5-001
 
 ```
-$ cc cc-sort.c
-$ link cc-sort
-$ run cc-sort
-bubblesort : 41.300 s
-shellsort  :  1.500 s
-quicksort  :  1.520 s
+$ cc gcc-sort.c
+$ link gcc-sort
+$ run gcc-sort
+bubblesort    : 41.070 s
+exchangesort  : 34.880 s
+insertionsort : 29.690 s
+shellsort     :  1.550 s
+quicksort     :  1.490 s
+quicksort (*) :  0.730 s
 $ 
 ```
 ```
-$ cc cc-sort.c /architecture=ev6
-$ link cc-sort
-$ run cc-sort
-bubblesort : 31.950 s
-shellsort  :  1.120 s
-quicksort  :  0.950 s
+$ cc gcc-sort.c /architecture=ev6
+$ link gcc-sort
+$ run gcc-sort
+bubblesort    : 31.740 s
+exchangesort  : 23.110 s
+insertionsort : 11.360 s
+shellsort     :  1.150 s
+quicksort     :  0.950 s
+quicksort (*) :  0.730 s
+
 $
 ```
 
 - AlphaServer ES40/1000 running OpenVMS Alpha V8.4-2L2 with VSI C V7.4-002
 
 ```
-$ cc cc-sort /architecture=ev6
-$ link cc-sort
-$ run cc-sort
-bubblesort : 17.770 s
-shellsort  :  0.590 s
-quicksort  :  0.440 s
+$ cc gcc-sort.c
+$ link gcc-sort
+$ run gcc-sort
+bubblesort    : 26.620 s
+exchangesort  : 17.340 s
+insertionsort : 16.340 s
+shellsort     :  0.730 s
+quicksort     :  0.760 s
+quicksort (*) :  1.010 s
+$ 
+```
+```
+$ cc gcc-sort /architecture=ev6
+$ link gcc-sort
+$ run gcc-sort
+bubblesort    : 17.650 s
+exchangesort  : 16.500 s
+insertionsort :  9.230 s
+shellsort     :  0.610 s
+quicksort     :  0.540 s
+quicksort (*) :  0.980 s
 $ 
 ```
 
 - HP D710 Desktop Intel Pentium 4 (3.0 GHz) running Debian 12 with GCC 12.2.0-14
 
 ```
-$ cc cc-sort.c -o cc-sort
+$ cc gcc-sort.c -o gcc-sort
 $ ./gcc-sort 
 bubblesort : 15.744 s
 shellsort  :  0.545 s
@@ -89,11 +130,14 @@ $
 - HP Z420 Workstation Intel Xeon E5-1650v2 (3.5 GHz) running Debian 10 with GCC 8.3.0-6
 
 ```
-$ cc cc-sort.c -o cc-sort
-$ ./cc-sort
-bubblesort   :  5.869 s
-shellsort    :  0.231 s
-quicksort    :  0.180 s
+$ cc gcc-sort.c -o gcc-sort
+$ ./gcc-sort
+bubblesort    :  5.702 s
+exchangesort  :  4.332 s
+insertionsort :  3.534 s
+shellsort     :  0.228 s
+quicksort     :  0.180 s
+quicksort (*) :  0.084 s
 $
 ```
 
