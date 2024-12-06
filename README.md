@@ -115,15 +115,30 @@ quicksort     :  0.540 s
 quicksort (*) :  0.980 s
 $ 
 ```
+- Raspberry Pi 3B Plus Rev 1.3 running Debian 10 with GCC 8.3.0-6
+
+```
+$ cc gcc-sort.c -o gcc-sort
+$ ./gcc-sort 
+bubblesort    : 97.184 s
+exchangesort  : 63.729 s
+insertionsort : 55.552 s
+shellsort     :  2.886 s
+quicksort     :  2.515 s
+quicksort (*) :  0.852 s
+```
 
 - HP D710 Desktop Intel Pentium 4 (3.0 GHz) running Debian 12 with GCC 12.2.0-14
 
 ```
 $ cc gcc-sort.c -o gcc-sort
 $ ./gcc-sort 
-bubblesort : 15.744 s
-shellsort  :  0.545 s
-quicksort  :  0.447 s
+bubblesort    : 15.714 s
+exchangesort  : 11.685 s
+insertionsort :  8.929 s
+shellsort     :  0.541 s
+quicksort     :  0.446 s
+quicksort (*) :  0.266 s
 $
 ```
 
