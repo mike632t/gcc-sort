@@ -3,11 +3,15 @@
 A re-implementation of the sort routines in K&R Ed 2 to make them more like 
 the current sort routine in the standard library.
 
-- quicksort    - based on K+R Ed 2 Page 120
+- quick sort      - based on K+R Ed 2 Page 120
 
-- shellsort    - based on K+R Ed 2 Page 62
+- shell sort      - based on K+R Ed 2 Page 62
 
-- bubblesort 
+- insertion sort
+
+- exchange sort
+
+- bubble sort 
 
 - shuffle
 
