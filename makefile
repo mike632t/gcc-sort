@@ -34,7 +34,7 @@ FILES	=  $(SOURCE) $(BACKUP) $(INCLUDE) # LICENSE README.md makefile .gitignore 
 LANG	=  LANG_$(shell (echo $$LANG | cut -f 1 -d '_'))
 UNAME	=  $(shell uname)
 
-#LIBS	=
+LIBS	=  -lm
 FLAGS	=  -fcommon -Wall -pedantic -std=gnu99
 FLAGS	+= -Wno-comment #-Wno-deprecated-declarations -Wno-builtin-macro-redefined
 FLAGS	+= -D $(LANG)
@@ -47,8 +47,8 @@ endif
 
 # Compiler specific settings
 ifeq ($(CC), cc)
-LIBS	+=  -no-pie
-#FLAGS	+=  -ansi
+#LIBS	+=  
+FLAGS	+=  -no-pie
 endif
 
 ifdef DEBUG
@@ -70,9 +70,9 @@ endif
 # and validate that it was created
 %: %.o
 ifdef DEBUG
-	@echo $(CC) $(FLAGS) -o $@ $<
+	@echo $(CC) $(FLAGS) -o $@ $<  $(LIBS)
 endif
-	@$(CC) $(FLAGS) -o $@ $<
+	@$(CC) $(FLAGS) -o $@ $<  $(LIBS)
 	@ls --color $@
 
 clean:
