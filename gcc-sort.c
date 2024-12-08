@@ -32,6 +32,10 @@
  * 03 Dec 24         - Finally managed to implement an insertion sort which
  *                     is still much slower then a shell sort but is faster
  *                     than an exchange sort - MT
+ * 08 Dec 24   0.3   - Added  counters allow the number comparison and swap
+ *                     operations are required and uses separate  functions
+ *                     to reinitialise the array and display the results of
+ *                     each test - MT 
  *
  */
 
@@ -44,6 +48,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include <time.h>
 
 #define  ITERATIONS  1000
@@ -53,10 +58,13 @@
 #define  CLOCKS_PER_SEC CLK_TCK
 #endif
 
+int i_compaires, i_swaps, i_copies;
+
 int cmpint (const void *h_left, const void *h_right)
 {
    int i_left = *(int *)h_left;
    int i_right = *(int *)h_right;
+   i_compaires++;
    return (i_left > i_right) - (i_left < i_right);
 }
 
@@ -108,6 +116,7 @@ static void swap (void *v_left, void *v_right, size_t t_size)
    unsigned char *h_right = (unsigned char*) v_right;
    unsigned char c_temp;
 
+   i_swaps++;
    while (t_size-- > 0) /* Swap each byte in turn. */
    {
       c_temp = *h_left;
@@ -123,6 +132,7 @@ static void copy (void *v_left, void *v_right, size_t t_size)
    unsigned char *h_left = (unsigned char*) v_left;
    unsigned char *h_right = (unsigned char*) v_right;
 
+   i_copies++;
    while (t_size-- > 0) /* Swap each byte in turn. */
       *h_left++ = *h_right++;
 }
@@ -208,9 +218,10 @@ void insertionsort (void *v_array, size_t t_num, size_t t_size, int (*v_compare)
    free(h_tmp);
 }
 
-/* Alternative implementation using swap instead of a temporary vairable.
+void _insertionsort (void *v_array, size_t t_num, size_t t_size, int (*v_compare)(const void *, const void *))
+/* Alternative implementation using swap instead of a temporary variable.
  * 
- * Note - This is approximately 25% slower.
+ * Note - This is approximately 25% slower. */
 {
    unsigned char *h_ptr = (unsigned char *)v_array;
    unsigned i_count, i_next;
@@ -223,7 +234,7 @@ void insertionsort (void *v_array, size_t t_num, size_t t_size, int (*v_compare)
          i_next--;
       }
    }
-} */
+}
 
 void shellsort (void *v_array, size_t t_num, size_t t_size, int (*v_compare)(const void *, const void *))
 
@@ -273,87 +284,107 @@ void quicksort (void *v_array, size_t t_num, size_t t_size, int (*v_compare)(con
    _quicksort (v_array, 0, t_num - 1, t_size, v_compare);
 }
 
+void init (int *i_array, size_t t_num)
+{
+   size_t i_count;
+   if (t_num > 0)
+   {
+      srand(32765);
+      for (i_count = 0; i_count < t_num; i_count++)
+         i_array[i_count] = rand() % 199 - 99 ;
+         //i_array[i_count] = t_num- i_count;
+      i_compaires = 0;
+      i_copies = 0;
+      i_swaps = 0;
+   }
+}
+
+void print (char *s_name, double d_time)
+{
+   printf ("%s%*s : %6.3f s", s_name, (int)(14 - strlen(s_name)),  "", (double)(d_time) / CLOCKS_PER_SEC);
+   if (i_compaires) printf ("%*s%d comparisons", (int)(8 - log10(i_compaires)), "", i_compaires);
+   if (i_copies) printf ("%*s%d copies", (int)(8 - log10(i_copies)), "", i_copies);
+   if (i_swaps) printf ("%*s%d swaps", (int)(8 - log10(i_swaps)), "", i_swaps);
+   printf ("\n");
+}
+
 int main(void)
 {
    clock_t t_start, t_finish, t_baseline;
    int i_numbers[SIZE];
-   int i_count, i_counter;
-   int i_size;
+   int i_count, i_size;
    
    i_size = sizeof(i_numbers)/sizeof(i_numbers[0]);
 
-   for (i_counter = 0; i_counter < ITERATIONS; i_counter++)
-   {
-      for (i_count = 0; i_count < SIZE; i_count++)
-         i_numbers[i_count] = rand() % 199 - 99 ;
-   }
+   for (i_count = 0; i_count < ITERATIONS; i_count++)
+      init (i_numbers, SIZE);
 
    t_start = clock();
-   for (i_counter = 0; i_counter < ITERATIONS; i_counter++)
-   {
-      for (i_count = 0; i_count < SIZE; i_count++)
-         i_numbers[i_count] = rand() % 199 - 99 ;
-   }
+   for (i_count = 0; i_count < ITERATIONS; i_count++)
+      init (i_numbers, SIZE);
    t_finish = clock();
    t_baseline = t_finish - t_start;
 
    t_start = clock();
-   for (i_counter = 0; i_counter < ITERATIONS; i_counter++)
+   for (i_count = 0; i_count < ITERATIONS; i_count++)
    {
-      for (i_count = 0; i_count < SIZE; i_count++)
-         i_numbers[i_count] = rand() % 199 - 99 ;
+      init (i_numbers, SIZE);
       bubblesort (i_numbers, i_size, sizeof(*i_numbers), cmpint);
    }
    t_finish = clock();
-   printf ("bubblesort    : %6.3f s\n", (double)(t_finish  - t_start - t_baseline) / CLOCKS_PER_SEC);
-
+   print ("bubblesort", (double)(t_finish  - t_start - t_baseline));
+   
    t_start = clock();
-   for (i_counter = 0; i_counter < ITERATIONS; i_counter++)
+   for (i_count = 0; i_count < ITERATIONS; i_count++)
    {
-      for (i_count = 0; i_count < SIZE; i_count++)
-         i_numbers[i_count] = rand() % 199 - 99 ;
+      init (i_numbers, SIZE);
       exchangesort (i_numbers, i_size, sizeof(*i_numbers), cmpint);
    }
    t_finish = clock();
-   printf ("exchangesort  : %6.3f s\n", (double)(t_finish  - t_start - t_baseline) / CLOCKS_PER_SEC);
+   print ("exchangesort", (double)(t_finish  - t_start - t_baseline));
 
    t_start = clock();
-   for (i_counter = 0; i_counter < ITERATIONS; i_counter++)
+   for (i_count = 0; i_count < ITERATIONS; i_count++)
    {
-      for (i_count = 0; i_count < SIZE; i_count++)
-         i_numbers[i_count] = rand() % 199 - 99 ;
+      init (i_numbers, SIZE);
+      _insertionsort (i_numbers, i_size, sizeof(*i_numbers), cmpint);
+   }
+   t_finish = clock();
+   print ("insertionsort", (double)(t_finish  - t_start - t_baseline));
+      
+   t_start = clock();
+   for (i_count = 0; i_count < ITERATIONS; i_count++)
+   {
+      init (i_numbers, SIZE);
       insertionsort (i_numbers, i_size, sizeof(*i_numbers), cmpint);
    }
    t_finish = clock();
-   printf ("insertionsort : %6.3f s\n", (double)(t_finish  - t_start - t_baseline) / CLOCKS_PER_SEC);
-
+   print ("insertionsort", (double)(t_finish  - t_start - t_baseline));
+   
    t_start = clock();
-   for (i_counter = 0; i_counter < ITERATIONS; i_counter++)
+   for (i_count = 0; i_count < ITERATIONS; i_count++)
    {
-      for (i_count = 0; i_count < SIZE; i_count++)
-         i_numbers[i_count] = rand() % 199 - 99 ;
+      init (i_numbers, SIZE);
       shellsort (i_numbers, i_size, sizeof(*i_numbers), cmpint);
    }
    t_finish = clock();
-   printf ("shellsort     : %6.3f s\n", (double)(t_finish  - t_start - t_baseline) / CLOCKS_PER_SEC);
-
+   print ("shellsort", (double)(t_finish  - t_start - t_baseline));
+   
    t_start = clock();
-   for (i_counter = 0; i_counter < ITERATIONS; i_counter++)
+   for (i_count = 0; i_count < ITERATIONS; i_count++)
    {
-      for (i_count = 0; i_count < SIZE; i_count++)
-         i_numbers[i_count] = rand() % 199 - 99 ;
+      init (i_numbers, SIZE);
       quicksort (i_numbers, i_size, sizeof(*i_numbers), cmpint);
    }
    t_finish = clock();
-   printf ("quicksort     : %6.3f s\n", (double)(t_finish  - t_start - t_baseline) / CLOCKS_PER_SEC);
+   print ("quicksort", (double)(t_finish  - t_start - t_baseline));
 
    t_start = clock();
-   for (i_counter = 0; i_counter < ITERATIONS; i_counter++)
+   for (i_count = 0; i_count < ITERATIONS; i_count++)
    {
-      for (i_count = 0; i_count < SIZE; i_count++)
-         i_numbers[i_count] = rand() % 199 - 99 ;
+      init (i_numbers, SIZE);
       qsort (i_numbers, i_size, sizeof(*i_numbers), cmpint);
    }
    t_finish = clock();
-   printf ("quicksort (*) : %6.3f s\n", (double)(t_finish  - t_start - t_baseline) / CLOCKS_PER_SEC);
+   print ("quicksort (*)", (double)(t_finish  - t_start - t_baseline));
 }
