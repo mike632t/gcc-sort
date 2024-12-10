@@ -99,24 +99,26 @@ $
 $ cc gcc-sort.c
 $ link gcc-sort
 $ run gcc-sort
-bubblesort    : 26.620 s
-exchangesort  : 17.340 s
-insertionsort : 16.340 s
-shellsort     :  0.730 s
-quicksort     :  0.760 s
-quicksort (*) :  1.010 s
+bubblesort     : 28.050 s  499500 comparisons  251379 swaps
+exchangesort   : 19.030 s  499500 comparisons   80100 swaps
+insertionsort  : 21.510 s  254864 comparisons  253875 swaps
+insertionsort  : 17.600 s  252371 comparisons  253377 copies
+shellsort      :  0.820 s   13916 comparisons    6422 swaps
+quicksort      :  0.830 s   11724 comparisons    6891 swaps
+quicksort (*)  :  0.970 s   10119 comparisons
 $ 
 ```
 ```
 $ cc gcc-sort /architecture=ev6
 $ link gcc-sort
 $ run gcc-sort
-bubblesort    : 17.650 s
-exchangesort  : 16.500 s
-insertionsort :  9.230 s
-shellsort     :  0.610 s
-quicksort     :  0.540 s
-quicksort (*) :  0.980 s
+bubblesort     : 20.990 s  499500 comparisons  251379 swaps
+exchangesort   : 17.330 s  499500 comparisons   80100 swaps
+insertionsort  : 14.490 s  254864 comparisons  253875 swaps
+insertionsort  : 14.180 s  252371 comparisons  253377 copies
+shellsort      :  0.650 s   13916 comparisons    6422 swaps
+quicksort      :  0.700 s   11724 comparisons    6891 swaps
+quicksort (*)  :  1.060 s   10119 comparisons
 $ 
 ```
 - Raspberry Pi 3B Plus Rev 1.3 running Debian 10 with GCC 8.3.0-6
