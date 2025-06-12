@@ -35,15 +35,17 @@
  * 08 Dec 24   0.3   - Added  counters allow the number comparison and swap
  *                     operations are required and uses separate  functions
  *                     to reinitialise the array and display the results of
- *                     each test - MT 
+ *                     each test - MT
+ * 12 Jun 25         - Added a generic linear search routine and tidied  up
+ *                     comments and spacing - MT
  *
  */
-
-#define  NAME        "gcc-sort"
-#define  VERSION     "0.2"
-#define  BUILD       "0005"
-#define  DATE        "03 Nov 24"
-#define  AUTHOR      "MT"
+ 
+#define  NAME          "gcc-sort"
+#define  VERSION       "0.2"
+#define  BUILD         "0005"
+#define  DATE          "03 Nov 24"
+#define  AUTHOR        "MT"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -51,8 +53,11 @@
 #include <math.h>
 #include <time.h>
 
-#define  ITERATIONS  1000
-#define  SIZE        1000
+#define  True          -1
+#define  False         0
+
+#define  ITERATIONS    1000
+#define  SIZE          1000
 
 #if defined(VMS) && defined(VAX) && !defined(CLOCKS_PER_SEC)
 #define  CLOCKS_PER_SEC CLK_TCK
@@ -111,6 +116,7 @@ void prtint (int *i_array, size_t t_num)
 static void swap (void *v_left, void *v_right, size_t t_size)
 
 /* Byte for byte exchange will swap either pointers or values. */
+
 {
    unsigned char *h_left = (unsigned char*) v_left;
    unsigned char *h_right = (unsigned char*) v_right;
@@ -128,6 +134,7 @@ static void swap (void *v_left, void *v_right, size_t t_size)
 static void copy (void *v_left, void *v_right, size_t t_size)
 
 /* Byte for byte exchange will swap either pointers or values. */
+
 {
    unsigned char *h_left = (unsigned char*) v_left;
    unsigned char *h_right = (unsigned char*) v_right;
@@ -137,7 +144,10 @@ static void copy (void *v_left, void *v_right, size_t t_size)
       *h_left++ = *h_right++;
 }
 
-void shuffle (void *v_array, size_t t_num, size_t t_size)
+static void shuffle (void *v_array, size_t t_num, size_t t_size)
+
+/* Shuffle array elements. */
+
 {
    unsigned char *h_ptr = (unsigned char *)v_array;
    size_t i_count, i_random;
@@ -149,9 +159,26 @@ void shuffle (void *v_array, size_t t_num, size_t t_size)
    }
 }
 
+char search(void *v_array, void *v_data, size_t t_num, size_t t_size, int (*v_compare)(const void *, const void *)) 
+
+/* Linear array search. */
+
+{
+   unsigned char *h_ptr = (unsigned char *)v_array;
+   unsigned char *h_data = (unsigned char *)v_data;
+
+   size_t i_count, i_upper = t_num;
+
+   for (i_count = 0; i_count < i_upper; i_count++)
+      if ((v_compare(h_ptr + i_count * t_size, h_data)) == 0)
+         return True;
+   return False;
+}
+
 void reverse (void *v_array, size_t t_num, size_t t_size)
 
-/* Based on K+R Ed 2 Page 62. */
+/* Reverse elements in an array. Based on K+R Ed 2 Page 62. */
+
 {
    unsigned char *h_ptr = (unsigned char *)v_array;
    size_t i_count = 0;
@@ -166,6 +193,7 @@ void bubblesort (void *v_array, size_t t_num, size_t t_size, int (*v_compare)(co
 
 /* Iterates over the elements in the array comparing each pair of  adjacent
  * elements, swapping pairs of elements that are out of order. */
+ 
 {
    unsigned char *h_ptr = (unsigned char *)v_array;
    size_t i_count, i_next, i_upper = t_num;
@@ -182,6 +210,7 @@ void exchangesort (void *v_array, size_t t_num, size_t t_size, int (*v_compare)(
  * following  element in the array.  If any of the following  elements  are
  * smaller than the current element, it is swapped with the current element
  * and the process repeated for the next element in the array. */
+ 
 {
    unsigned char *h_ptr = (unsigned char *)v_array;
    size_t i_count, i_next;
@@ -199,6 +228,7 @@ void insertionsort (void *v_array, size_t t_num, size_t t_size, int (*v_compare)
 /* Compares each successive element in the array with all of the  preceding
  * elements.  When an appropriate position if found the element is inserted
  * in its position, and all the other elements are moved down one place. */
+ 
 {
    unsigned char *h_ptr = (unsigned char *)v_array;
    unsigned char *h_tmp = (unsigned char *)malloc(t_size+10);
@@ -219,9 +249,11 @@ void insertionsort (void *v_array, size_t t_num, size_t t_size, int (*v_compare)
 }
 
 void _insertionsort (void *v_array, size_t t_num, size_t t_size, int (*v_compare)(const void *, const void *))
+
 /* Alternative implementation using swap instead of a temporary variable.
  * 
  * Note - This is approximately 25% slower. */
+ 
 {
    unsigned char *h_ptr = (unsigned char *)v_array;
    unsigned i_count, i_next;
@@ -243,6 +275,7 @@ void shellsort (void *v_array, size_t t_num, size_t t_size, int (*v_compare)(con
  * Starts  by  comparing elements that are separated by a gap that is  half
  * the distance between the first and last element, the gap is then reduced
  * by half and the process repeated until the gap is one. */
+ 
 {
    unsigned char *h_ptr = (unsigned char *)v_array;
    size_t i_count, i_gap;                                                                 /* int gap, i, j, temp; */
@@ -261,6 +294,7 @@ void shellsort (void *v_array, size_t t_num, size_t t_size, int (*v_compare)(con
 void _quicksort (void *v_array, size_t t_left, size_t t_right, size_t t_size, int (*v_compare)(const void *, const void *))
 
 /* Based on K+R Ed 2 Page 120. */
+
 {
    unsigned char *h_ptr = (unsigned char *)v_array;
    size_t i_count, i_last;                                                                /* int i_count, i_last; */
@@ -280,6 +314,7 @@ void quicksort (void *v_array, size_t t_num, size_t t_size, int (*v_compare)(con
 
 /* Wrapper for _quicksort() to make conform to the same calling standard as
  * the implementation in stdlib. */
+ 
 {
    _quicksort (v_array, 0, t_num - 1, t_size, v_compare);
 }
