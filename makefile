@@ -36,7 +36,7 @@ UNAME	=  $(shell uname)
 
 LIBS	=  -lm
 FLAGS	=  -fcommon -Wall -pedantic -std=gnu99
-FLAGS	+= -Wno-comment #-Wno-deprecated-declarations -Wno-builtin-macro-redefined
+FLAGS	+= -Wno-comment -Wno-unused-function #-Wno-deprecated-declarations -Wno-builtin-macro-redefined
 FLAGS	+= -D $(LANG)
 
 # Operating system specific settings
