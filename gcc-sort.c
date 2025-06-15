@@ -34,12 +34,16 @@
  *                     than an exchange sort - MT
  * 08 Dec 24   0.3   - Added  counters allow the number comparison and swap
  *                     operations are required and uses separate  functions
- *                     to reinitialize the array and display the results of
+ *                     to reinitialise the array and display the results of
  *                     each test - MT
  * 12 Jun 25   0.4   - Added a generic linear search routine and tidied  up
  *                     comments and spacing - MT
- * 13 Jun 24         - Initialize the array using the same test data  every
+ * 13 Jun 24         - Initialise the array using the same test data  every
  *                     time - MT
+ * 15 Jun 25         - Check the number of elements in the array is greater
+ *                     then 1 before trying to shuffle it - MT
+ *                   - Checked spelling and rewrote initialisation  routine
+ *                     to separate the two different approaches  - MT
  *
  */
 
@@ -78,6 +82,7 @@ int cmpint (const void *h_left, const void *h_right)
 int cmpnum (const void *h_left, const void *h_right)
 
 /* Based on K+R Ed 2 Page 121 */
+
 {
    int i_left  = atoi(*(char **)h_left);
    int i_right = atoi(*(char **)h_right);
@@ -154,10 +159,13 @@ static void shuffle (void *v_array, size_t t_num, size_t t_size)
    unsigned char *h_ptr = (unsigned char *)v_array;
    size_t i_count, i_random;
 
-   for (i_count = t_num - 1; i_count > 0 ; i_count--)
+   if (t_num > 1) /* Check that there are two or more elements in the array */
    {
-      i_random = (int)((double)i_count * (rand() / (RAND_MAX + 1.0)));
-      swap (h_ptr + i_count * t_size, h_ptr + i_random * t_size, t_size);
+      for (i_count = t_num - 1; i_count > 0 ; i_count--)
+      {
+         i_random = (size_t)((double)i_count * (rand() / (RAND_MAX + 1.0)));
+         swap (h_ptr + i_count * t_size, h_ptr + i_random * t_size, t_size);
+      }
    }
 }
 
@@ -184,11 +192,11 @@ void reverse (void *v_array, size_t t_num, size_t t_size)
 {
    unsigned char *h_ptr = (unsigned char *)v_array;
    size_t i_count = 0;
-      while (i_count < --t_num)
-      {
-         swap (h_ptr + i_count * t_size, h_ptr + t_num * t_size, t_size);
-         i_count++;
-      }
+   while (i_count < --t_num)
+   {
+      swap (h_ptr + i_count * t_size, h_ptr + t_num * t_size, t_size);
+      i_count++;
+   }
 }
 
 void bubblesort (void *v_array, size_t t_num, size_t t_size, int (*v_compare)(const void *, const void *))
@@ -221,7 +229,7 @@ void exchangesort (void *v_array, size_t t_num, size_t t_size, int (*v_compare)(
          if ((v_compare(h_ptr + i_count * t_size, h_ptr + i_next * t_size)) > 0) 
             /* If  the  previous element is bigger than the next swap  them
              * over. */
-            swap (h_ptr + i_count * t_size, h_ptr + i_next * t_size, t_size);         
+            swap (h_ptr + i_count * t_size, h_ptr + i_next * t_size, t_size);
 }
 
 void insertionsort (void *v_array, size_t t_num, size_t t_size, int (*v_compare)(const void *, const void *))
@@ -232,8 +240,13 @@ void insertionsort (void *v_array, size_t t_num, size_t t_size, int (*v_compare)
  
 {
    unsigned char *h_ptr = (unsigned char *)v_array;
-   unsigned char *h_tmp = (unsigned char *)malloc(t_size+10);
+   unsigned char *h_tmp = (unsigned char *)malloc(t_size);
    size_t i_count, i_next;
+
+   if (!h_tmp) {
+      fprintf(stderr, "Memory allocation failed in insertionsort\n");
+      exit(EXIT_FAILURE);
+   }
 
    for (i_count = 1; i_count < t_num; i_count++)
    {
@@ -320,7 +333,30 @@ void quicksort (void *v_array, size_t t_num, size_t t_size, int (*v_compare)(con
    _quicksort (v_array, 0, t_num - 1, t_size, v_compare);
 }
 
-void init (int *i_array, size_t t_num)
+
+void initint (int *i_array, size_t t_num)
+
+/* Using  the built in random number generator will give a different set of
+ * values with different compilers. */ 
+/** 
+{
+   size_t i_count;
+
+   if (t_num > 0)
+   {
+      srand(32765); 
+      for (i_count = 0; i_count < SIZE; i_count++)
+         i_array[i_count] = rand() % 199 - 99 ;
+      i_compaires = 0;
+      i_copies = 0;
+      i_swaps = 0;
+   }
+}
+*/
+
+/* Using a fixed set of random numbers allows the performance of different 
+ * systems/compilers to be compared with each other. */ 
+
 {
    const int i_constant[SIZE] = 
    { 
@@ -450,10 +486,11 @@ void init (int *i_array, size_t t_num)
       653, 847,  15, 819, 961, 875, 620, 329,
       781, 500, 380, 359, 312, 761,  15, 819
    };
+
    size_t i_count;
+
    if (t_num > 0)
    {
-      srand(32765);
       for (i_count = 0; i_count < t_num; i_count++)
          i_array[i_count] = i_constant[i_count];
       i_compaires = 0;
@@ -462,10 +499,10 @@ void init (int *i_array, size_t t_num)
    }
 }
 
-void print (char *s_name, double d_time)
+void print(char *s_name, double d_time)
 {
    printf ("%s%*s : %6.3f s", s_name, (int)(14 - strlen(s_name)),  "", (double)(d_time) / CLOCKS_PER_SEC);
-   if (i_compaires) printf ("%*s%d comparisons", (int)(8 - log10(i_compaires))git reset --hard HEAD^, "", i_compaires);
+   if (i_compaires) printf ("%*s%d comparisons", (int)(8 - log10(i_compaires)), "", i_compaires);
    if (i_copies) printf ("%*s%d copies", (int)(8 - log10(i_copies)), "", i_copies);
    if (i_swaps) printf ("%*s%d swaps", (int)(8 - log10(i_swaps)), "", i_swaps);
    printf ("\n");
@@ -474,30 +511,31 @@ void print (char *s_name, double d_time)
 int main(void)
 {
    clock_t t_start, t_finish, t_baseline = 0;
+   
    int i_numbers[SIZE];
    int i_count, i_size;
-   
+
    i_size = sizeof(i_numbers)/sizeof(i_numbers[0]);
 
    t_start = clock();
    for (i_count = 0; i_count < ITERATIONS; i_count++)
-      init (i_numbers, SIZE);
+      initint (i_numbers, i_size);
    t_finish = clock();
    t_baseline = t_finish - t_start;
 
    t_start = clock();
    for (i_count = 0; i_count < ITERATIONS; i_count++)
    {
-      init (i_numbers, SIZE);
+      initint (i_numbers, i_size);
       bubblesort (i_numbers, i_size, sizeof(*i_numbers), cmpint);
    }
    t_finish = clock();
    print ("bubblesort", (double)(t_finish  - t_start - t_baseline));
-   
+
    t_start = clock();
    for (i_count = 0; i_count < ITERATIONS; i_count++)
    {
-      init (i_numbers, SIZE);
+      initint (i_numbers, i_size);
       exchangesort (i_numbers, i_size, sizeof(*i_numbers), cmpint);
    }
    t_finish = clock();
@@ -507,35 +545,35 @@ int main(void)
    t_start = clock();
    for (i_count = 0; i_count < ITERATIONS; i_count++)
    {
-      init (i_numbers, SIZE);
+      initint (i_numbers, i_size);
       _insertionsort (i_numbers, i_size, sizeof(*i_numbers), cmpint);
    }
    t_finish = clock();
    print ("insertionsort", (double)(t_finish  - t_start - t_baseline));
    */
-      
+
    t_start = clock();
    for (i_count = 0; i_count < ITERATIONS; i_count++)
    {
-      init (i_numbers, SIZE);
+      initint (i_numbers, i_size);
       insertionsort (i_numbers, i_size, sizeof(*i_numbers), cmpint);
    }
    t_finish = clock();
    print ("insertionsort", (double)(t_finish  - t_start - t_baseline));
-   
+
    t_start = clock();
    for (i_count = 0; i_count < ITERATIONS; i_count++)
    {
-      init (i_numbers, SIZE);
+      initint (i_numbers, i_size);
       shellsort (i_numbers, i_size, sizeof(*i_numbers), cmpint);
    }
    t_finish = clock();
    print ("shellsort", (double)(t_finish  - t_start - t_baseline));
-   
+
    t_start = clock();
    for (i_count = 0; i_count < ITERATIONS; i_count++)
    {
-      init (i_numbers, SIZE);
+      initint (i_numbers, i_size);
       quicksort (i_numbers, i_size, sizeof(*i_numbers), cmpint);
    }
    t_finish = clock();
@@ -544,7 +582,7 @@ int main(void)
    t_start = clock();
    for (i_count = 0; i_count < ITERATIONS; i_count++)
    {
-      init (i_numbers, SIZE);
+      initint (i_numbers, i_size);
       qsort (i_numbers, i_size, sizeof(*i_numbers), cmpint);
    }
    t_finish = clock();
