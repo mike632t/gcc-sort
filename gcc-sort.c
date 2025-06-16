@@ -355,7 +355,7 @@ void init (int *i_array, size_t t_num, size_t t_size)
 */
 
 /* Shuffling the array also depends on the random number generator and will
- * also give different results with different compilers. */ 
+ * give different results with different compilers. */ 
 
 {
    size_t i_count;
