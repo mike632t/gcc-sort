@@ -44,12 +44,13 @@
  *                     then 1 before trying to shuffle it - MT
  *                   - Checked spelling and rewrote initialisation  routine
  *                     to separate the two different approaches  - MT
+ *                   - Can also initialise the array using shuffle() - MT 
  *
  */
 
 #define  NAME        "gcc-sort"
 #define  VERSION     "0.2"
-#define  BUILD       "0010"
+#define  BUILD       "0013"
 #define  DATE        "13 Jun 25"
 #define  AUTHOR      "MT"
 
@@ -333,18 +334,17 @@ void quicksort (void *v_array, size_t t_num, size_t t_size, int (*v_compare)(con
    _quicksort (v_array, 0, t_num - 1, t_size, v_compare);
 }
 
+void init (int *i_array, size_t t_num, size_t t_size)
 
-void initint (int *i_array, size_t t_num)
-
-/* Using  the built in random number generator will give a different set of
- * values with different compilers. */ 
+/* Using  the built in random number generator will give different  results
+ * with different compilers. */ 
 /** 
 {
    size_t i_count;
 
    if (t_num > 0)
    {
-      srand(32765); 
+      srand(1966); 
       for (i_count = 0; i_count < SIZE; i_count++)
          i_array[i_count] = rand() % 199 - 99 ;
       i_compaires = 0;
@@ -354,9 +354,26 @@ void initint (int *i_array, size_t t_num)
 }
 */
 
-/* Using a fixed set of random numbers allows the performance of different 
- * systems/compilers to be compared with each other. */ 
+/* Shuffling the array also depends on the random number generator and will
+ * also give different results with different compilers. */ 
 
+{
+   size_t i_count;
+   
+   srand (1966);
+   for (i_count = 0; i_count < t_num; i_count++)
+      i_array[i_count] = i_count - t_num / 2;
+   shuffle (i_array , t_num, t_size);
+   i_compaires = 0;
+   i_copies = 0;
+   i_swaps = 0;
+}
+
+
+/* However, using a fixed set of random values gives the same results every
+ * time which allows comparisons to be made between different systems. */ 
+
+/**
 {
    const int i_constant[SIZE] = 
    { 
@@ -498,6 +515,7 @@ void initint (int *i_array, size_t t_num)
       i_swaps = 0;
    }
 }
+ */
 
 void print(char *s_name, double d_time)
 {
@@ -519,14 +537,14 @@ int main(void)
 
    t_start = clock();
    for (i_count = 0; i_count < ITERATIONS; i_count++)
-      initint (i_numbers, i_size);
+      init (i_numbers, i_size, sizeof(*i_numbers));
    t_finish = clock();
    t_baseline = t_finish - t_start;
 
    t_start = clock();
    for (i_count = 0; i_count < ITERATIONS; i_count++)
    {
-      initint (i_numbers, i_size);
+      init (i_numbers, i_size, sizeof(*i_numbers));
       bubblesort (i_numbers, i_size, sizeof(*i_numbers), cmpint);
    }
    t_finish = clock();
@@ -535,7 +553,7 @@ int main(void)
    t_start = clock();
    for (i_count = 0; i_count < ITERATIONS; i_count++)
    {
-      initint (i_numbers, i_size);
+      init (i_numbers, i_size, sizeof(*i_numbers));
       exchangesort (i_numbers, i_size, sizeof(*i_numbers), cmpint);
    }
    t_finish = clock();
@@ -545,7 +563,7 @@ int main(void)
    t_start = clock();
    for (i_count = 0; i_count < ITERATIONS; i_count++)
    {
-      initint (i_numbers, i_size);
+      init (i_numbers, i_size, sizeof(*i_numbers));
       _insertionsort (i_numbers, i_size, sizeof(*i_numbers), cmpint);
    }
    t_finish = clock();
@@ -555,7 +573,7 @@ int main(void)
    t_start = clock();
    for (i_count = 0; i_count < ITERATIONS; i_count++)
    {
-      initint (i_numbers, i_size);
+      init (i_numbers, i_size, sizeof(*i_numbers));
       insertionsort (i_numbers, i_size, sizeof(*i_numbers), cmpint);
    }
    t_finish = clock();
@@ -564,7 +582,7 @@ int main(void)
    t_start = clock();
    for (i_count = 0; i_count < ITERATIONS; i_count++)
    {
-      initint (i_numbers, i_size);
+      init (i_numbers, i_size, sizeof(*i_numbers));
       shellsort (i_numbers, i_size, sizeof(*i_numbers), cmpint);
    }
    t_finish = clock();
@@ -573,7 +591,7 @@ int main(void)
    t_start = clock();
    for (i_count = 0; i_count < ITERATIONS; i_count++)
    {
-      initint (i_numbers, i_size);
+      init (i_numbers, i_size, sizeof(*i_numbers));
       quicksort (i_numbers, i_size, sizeof(*i_numbers), cmpint);
    }
    t_finish = clock();
@@ -582,7 +600,7 @@ int main(void)
    t_start = clock();
    for (i_count = 0; i_count < ITERATIONS; i_count++)
    {
-      initint (i_numbers, i_size);
+      init (i_numbers, i_size, sizeof(*i_numbers));
       qsort (i_numbers, i_size, sizeof(*i_numbers), cmpint);
    }
    t_finish = clock();
